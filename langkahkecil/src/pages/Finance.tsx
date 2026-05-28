@@ -2,17 +2,24 @@ import { useState } from 'react';
 import { useStore } from '@/store';
 import { SummaryCards } from '@/components/Finance/SummaryCards';
 import { TrendChart } from '@/components/Finance/TrendChart';
+import { CategoryPanel } from '@/components/Finance/CategoryPanel';
 import { FilterChips } from '@/components/Finance/FilterChips';
 import { TransactionList } from '@/components/Finance/TransactionList';
 import { AddTransactionModal } from '@/components/Finance/AddTransactionModal';
 import { Plus } from 'lucide-react';
 import { TransactionType } from '@/types';
+import { getToday } from '@/utils/formatters';
 
 export function FinancePage() {
   const lang = useStore((s) => s.settings.language);
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState<'all' | TransactionType>('all');
   const transactions = useStore((s) => s.transactions);
+  const today = getToday();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const [startDate, setStartDate] = useState(sevenDaysAgo.toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(today);
 
   const filtered = filter === 'all' ? transactions : transactions.filter((t) => t.type === filter);
 
@@ -24,7 +31,18 @@ export function FinancePage() {
 
       <div className="flex flex-col gap-4">
         <SummaryCards />
-        <TrendChart filter={filter} />
+        <TrendChart
+          filter={filter}
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+        />
+        <CategoryPanel
+          transactions={transactions}
+          startDate={startDate}
+          endDate={endDate}
+        />
         <FilterChips selected={filter} onChange={setFilter} />
         <TransactionList transactions={filtered} />
       </div>

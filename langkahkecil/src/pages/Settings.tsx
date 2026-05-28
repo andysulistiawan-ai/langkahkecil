@@ -59,6 +59,13 @@ export function SettingsPage() {
 
 const SPREADSHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
 
+const HEADERS = {
+  Tasks: ['id', 'name', 'color', 'order', 'done', 'created_at', 'updated_at'],
+  Transactions: ['id', 'type', 'amount', 'category', 'note', 'date', 'created_at', 'updated_at'],
+  Weight: ['id', 'weight', 'food_notes', 'date', 'created_at', 'updated_at'],
+  Categories: ['id', 'name', 'icon', 'type']
+};
+
 function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
     status: 'ok',
@@ -86,20 +93,31 @@ function doPost(e) {
   }
 }
 
+function ensureHeaders(sheet, collection) {
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(HEADERS[collection] || []);
+  }
+}
+
 function handleInit() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheetNames = ['Tasks', 'Transactions', 'Weight', 'Categories'];
-  sheetNames.forEach(name => { if (!ss.getSheetByName(name)) ss.insertSheet(name); });
+  const sheetNames = Object.keys(HEADERS);
+  for (let i = 0; i < sheetNames.length; i++) {
+    var s = ss.getSheetByName(sheetNames[i]);
+    if (!s) s = ss.insertSheet(sheetNames[i]);
+    ensureHeaders(s, sheetNames[i]);
+  }
 
-  const categorySheet = ss.getSheetByName('Categories');
-  if (categorySheet.getLastRow() === 1) {
-    const defaults = [
-      ['d1', 'Makanan', '\\uD83C\\uDF5C', ''], ['d2', 'Transport', '\\uD83D\\uDE97', ''],
-      ['d3', 'Belanja', '\\uD83D\\uDED2', ''], ['d4', 'Gaji', '\\uD83D\\uDCB0', ''],
-      ['d5', 'Hiburan', '\\uD83C\\uDFAD', ''], ['d6', 'Utilities', '\\uD83D\\uDCA1', ''],
-      ['d7', 'Kesehatan', '\\uD83C\\uDFE5', ''], ['d8', 'Pendidikan', '\\uD83D\\uDCDA', '']
+  var categorySheet = ss.getSheetByName('Categories');
+  var catData = categorySheet.getDataRange().getValues();
+  if (catData.length <= 1) {
+    var defaults = [
+      ['d1', 'Makanan', '\\uD83C\\uDF5C', ''], ['d3', 'Belanja', '\\uD83D\\uDED2', ''],
+      ['d4', 'Gaji', '\\uD83D\\uDCB0', ''], ['d5', 'Hiburan', '\\uD83C\\uDFAD', ''],
+      ['d6', 'Utilities', '\\uD83D\\uDCA1', '']
     ];
-    categorySheet.getRange(2, 1, defaults.length, 4).setValues(defaults);
+    var startRow = categorySheet.getLastRow() + 1;
+    categorySheet.getRange(startRow, 1, defaults.length, 4).setValues(defaults);
   }
   return successResponse('Sheets initialized');
 }
@@ -123,7 +141,9 @@ function handleFetch(collection) {
 function handleCreate(collection, data) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName(collection);
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  if (!sheet) return errorResponse('Sheet not found');
+  ensureHeaders(sheet, collection);
+  const headers = HEADERS[collection] || sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const row = headers.map(h => data[h] !== undefined ? data[h] : '');
   sheet.appendRow(row);
   return successResponse('Created', { id: data.id });
@@ -132,11 +152,13 @@ function handleCreate(collection, data) {
 function handleUpdate(collection, id, data) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName(collection);
+  if (!sheet) return errorResponse('Sheet not found');
+  ensureHeaders(sheet, collection);
   const range = sheet.getDataRange();
   const values = range.getValues();
+  const headers = values[0];
   for (let i = 1; i < values.length; i++) {
     if (values[i][0] === id) {
-      const headers = values[0];
       headers.forEach((h, j) => {
         if (data[h] !== undefined) sheet.getRange(i + 1, j + 1).setValue(data[h]);
       });
@@ -149,6 +171,7 @@ function handleUpdate(collection, id, data) {
 function handleDelete(collection, id) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName(collection);
+  if (!sheet) return errorResponse('Sheet not found');
   const range = sheet.getDataRange();
   const values = range.getValues();
   for (let i = 1; i < values.length; i++) {
@@ -171,7 +194,7 @@ function handleSync(records) {
 }
 
 function successResponse(message, data) {
-  const resp = { success: true, message, timestamp: new Date().toISOString() };
+  var resp = { success: true, message, timestamp: new Date().toISOString() };
   if (data) resp.data = data;
   return ContentService.createTextOutput(JSON.stringify(resp)).setMimeType(ContentService.MimeType.JSON);
 }

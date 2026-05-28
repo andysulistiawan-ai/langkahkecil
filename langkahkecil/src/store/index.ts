@@ -54,30 +54,33 @@ export const useStore = create<AppStore>()(
       setOnline: (online) => set({ isOnline: online }),
 
       addTask: (name, color) => {
-        const tasks = get().tasks;
         const now = new Date().toISOString();
         const task: Task = {
           id: generateId(),
           name,
           color,
-          order: tasks.length,
+          order: get().tasks.length,
           done: false,
           createdAt: now,
           updatedAt: now,
         };
-        set({ tasks: [...tasks, task] });
+        set({ tasks: [...get().tasks, task] });
+        get().addToQueue({ action: 'create', collection: 'Tasks', id: task.id, data: task });
       },
 
       updateTask: (id, updates) => {
+        const updatedAt = new Date().toISOString();
         set({
           tasks: get().tasks.map((t) =>
-            t.id === id ? { ...t, ...updates, updatedAt: new Date().toISOString() } : t
+            t.id === id ? { ...t, ...updates, updatedAt } : t
           ),
         });
+        get().addToQueue({ action: 'update', collection: 'Tasks', id, data: { ...updates, updatedAt } });
       },
 
       deleteTask: (id) => {
         set({ tasks: get().tasks.filter((t) => t.id !== id) });
+        get().addToQueue({ action: 'delete', collection: 'Tasks', id });
       },
 
       reorderTasks: (tasks) => set({ tasks }),
@@ -99,18 +102,22 @@ export const useStore = create<AppStore>()(
           updatedAt: now,
         };
         set({ transactions: [...get().transactions, transaction] });
+        get().addToQueue({ action: 'create', collection: 'Transactions', id: transaction.id, data: transaction });
       },
 
       updateTransaction: (id, updates) => {
+        const updatedAt = new Date().toISOString();
         set({
           transactions: get().transactions.map((t) =>
-            t.id === id ? { ...t, ...updates, updatedAt: new Date().toISOString() } : t
+            t.id === id ? { ...t, ...updates, updatedAt } : t
           ),
         });
+        get().addToQueue({ action: 'update', collection: 'Transactions', id, data: { ...updates, updatedAt } });
       },
 
       deleteTransaction: (id) => {
         set({ transactions: get().transactions.filter((t) => t.id !== id) });
+        get().addToQueue({ action: 'delete', collection: 'Transactions', id });
       },
 
       addWeight: (data) => {
@@ -122,18 +129,22 @@ export const useStore = create<AppStore>()(
           updatedAt: now,
         };
         set({ weights: [...get().weights, log] });
+        get().addToQueue({ action: 'create', collection: 'Weight', id: log.id, data: log });
       },
 
       updateWeight: (id, updates) => {
+        const updatedAt = new Date().toISOString();
         set({
           weights: get().weights.map((w) =>
-            w.id === id ? { ...w, ...updates, updatedAt: new Date().toISOString() } : w
+            w.id === id ? { ...w, ...updates, updatedAt } : w
           ),
         });
+        get().addToQueue({ action: 'update', collection: 'Weight', id, data: { ...updates, updatedAt } });
       },
 
       deleteWeight: (id) => {
         set({ weights: get().weights.filter((w) => w.id !== id) });
+        get().addToQueue({ action: 'delete', collection: 'Weight', id });
       },
 
       addCategory: (name, icon) => {

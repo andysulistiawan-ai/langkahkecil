@@ -2,13 +2,10 @@ export const TASK_COLORS = ['blue', 'coral', 'mint', 'yellow', 'purple', 'gray']
 
 export const DEFAULT_CATEGORIES = [
   { id: 'd1', name: 'Makanan', icon: '🍜' },
-  { id: 'd2', name: 'Transport', icon: '🚗' },
   { id: 'd3', name: 'Belanja', icon: '🛒' },
   { id: 'd4', name: 'Gaji', icon: '💰' },
   { id: 'd5', name: 'Hiburan', icon: '🎭' },
   { id: 'd6', name: 'Utilities', icon: '💡' },
-  { id: 'd7', name: 'Kesehatan', icon: '🏥' },
-  { id: 'd8', name: 'Pendidikan', icon: '📚' },
 ];
 
 export const STORAGE_KEYS = {

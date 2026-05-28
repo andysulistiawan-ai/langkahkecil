@@ -1,21 +1,18 @@
-import { useState } from 'react';
 import { useStore } from '@/store';
 import { formatDateShort, formatCurrency } from '@/utils/formatters';
-import { getToday } from '@/utils/formatters';
 import { TransactionType } from '@/types';
 
 interface TrendChartProps {
   filter: 'all' | TransactionType;
+  startDate: string;
+  endDate: string;
+  onStartDateChange: (date: string) => void;
+  onEndDateChange: (date: string) => void;
 }
 
-export function TrendChart({ filter }: TrendChartProps) {
+export function TrendChart({ filter, startDate, endDate, onStartDateChange, onEndDateChange }: TrendChartProps) {
   const transactions = useStore((s) => s.transactions);
   const lang = useStore((s) => s.settings.language);
-  const today = getToday();
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const [startDate, setStartDate] = useState(sevenDaysAgo.toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState(today);
 
   const filtered = filter === 'all' ? transactions : transactions.filter((t) => t.type === filter);
 
@@ -60,14 +57,14 @@ export function TrendChart({ filter }: TrendChartProps) {
           <input
             type="date"
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            onChange={(e) => onStartDateChange(e.target.value)}
             className="h-8 px-2 text-[11px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-sm text-[var(--color-text)] focus:outline-none focus:border-primary-500"
           />
           <span className="text-[11px] text-[var(--color-text-tertiary)]">-</span>
           <input
             type="date"
             value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            onChange={(e) => onEndDateChange(e.target.value)}
             className="h-8 px-2 text-[11px] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-sm text-[var(--color-text)] focus:outline-none focus:border-primary-500"
           />
         </div>

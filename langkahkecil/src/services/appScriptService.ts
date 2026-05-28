@@ -23,13 +23,13 @@ export class AppScriptService {
   }
 
   async post(body: any): Promise<AppScriptResponse> {
-    const response = await fetch(this.baseUrl, {
+    await fetch(this.baseUrl, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(body),
     });
-    return { success: true, data: null };
+    return { success: true };
   }
 
   async init() {

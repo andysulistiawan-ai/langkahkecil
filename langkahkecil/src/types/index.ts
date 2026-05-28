@@ -53,7 +53,7 @@ export type SyncAction = 'create' | 'update' | 'delete';
 
 export interface SyncRecord {
   action: SyncAction;
-  collection: 'tasks' | 'transactions' | 'weights' | 'categories';
+  collection: 'Tasks' | 'Transactions' | 'Weight' | 'Categories';
   id?: string;
   data?: any;
 }

@@ -27,7 +27,7 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
   const [newCatName, setNewCatName] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const allCats = [...DEFAULT_CATEGORIES, ...categories];
+  const allCats = [...DEFAULT_CATEGORIES, ...categories].filter((cat, i, arr) => arr.findIndex(c => c.name === cat.name) === i);
 
   const handleSubmit = () => {
     const errs: Record<string, string> = {};

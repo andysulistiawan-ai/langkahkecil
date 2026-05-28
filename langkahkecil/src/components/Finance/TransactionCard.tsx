@@ -12,7 +12,7 @@ interface TransactionCardProps {
 export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
   const deleteTransaction = useStore((s) => s.deleteTransaction);
   const categories = useStore((s) => s.categories);
-  const allCats = [...DEFAULT_CATEGORIES, ...categories];
+  const allCats = [...DEFAULT_CATEGORIES, ...categories].filter((cat, i, arr) => arr.findIndex(c => c.name === cat.name) === i);
   const cat = allCats.find((c) => c.name === transaction.category);
 
   return (
@@ -40,13 +40,13 @@ export function TransactionCard({ transaction, onEdit }: TransactionCardProps) {
       </div>
       <button
         onClick={() => onEdit(transaction)}
-        className="opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 p-1 rounded-sm text-[var(--color-text-tertiary)] hover:text-primary-500 transition-all"
+        className="p-1 rounded-sm text-[var(--color-text-tertiary)] hover:text-primary-500 transition-all"
       >
         <Edit3 size={16} />
       </button>
       <button
         onClick={() => deleteTransaction(transaction.id)}
-        className="opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 p-1 rounded-sm text-[var(--color-text-tertiary)] hover:text-red-500 transition-all"
+        className="p-1 rounded-sm text-[var(--color-text-tertiary)] hover:text-red-500 transition-all"
       >
         <Trash2 size={16} />
       </button>

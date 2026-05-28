@@ -25,13 +25,13 @@ export function WeightCard({ log, onEdit }: WeightCardProps) {
       </div>
       <button
         onClick={() => onEdit(log)}
-        className="opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 p-1 rounded-sm text-[var(--color-text-tertiary)] hover:text-primary-500 transition-all"
+        className="p-1 rounded-sm text-[var(--color-text-tertiary)] hover:text-primary-500 transition-all"
       >
         <Edit3 size={16} />
       </button>
       <button
         onClick={() => deleteWeight(log.id)}
-        className="opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 p-1 rounded-sm text-[var(--color-text-tertiary)] hover:text-red-500 transition-all"
+        className="p-1 rounded-sm text-[var(--color-text-tertiary)] hover:text-red-500 transition-all"
       >
         <Trash2 size={16} />
       </button>
