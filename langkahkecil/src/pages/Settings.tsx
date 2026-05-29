@@ -122,6 +122,16 @@ function handleInit() {
   return successResponse('Sheets initialized');
 }
 
+function formatCell(val) {
+  if (val instanceof Date) {
+    var y = val.getFullYear();
+    var m = ('0' + (val.getMonth() + 1)).slice(-2);
+    var d = ('0' + val.getDate()).slice(-2);
+    return y + '-' + m + '-' + d;
+  }
+  return val;
+}
+
 function handleFetch(collection) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = ss.getSheetByName(collection);
@@ -132,7 +142,7 @@ function handleFetch(collection) {
   const rows = data.slice(1).filter(r => r[0] !== '');
   const result = rows.map(row => {
     const obj = {};
-    headers.forEach((h, i) => { obj[h] = row[i]; });
+    headers.forEach((h, i) => { obj[h] = formatCell(row[i]); });
     return obj;
   });
   return successResponse('Fetched', result);

@@ -2,6 +2,24 @@ import { useStore } from '@/store';
 import { AppScriptService } from './appScriptService';
 import { Task, Transaction, WeightLog } from '@/types';
 
+function toLocalDate(val: any): string {
+  if (!val) return new Date().toISOString().split('T')[0];
+  if (typeof val === 'string' && val.length === 10) return val;
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function toLocalISO(val: any): string {
+  if (!val) return new Date().toISOString();
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return new Date().toISOString();
+  return d.toISOString();
+}
+
 function mapTask(row: any): Task {
   return {
     id: row.id,
@@ -9,8 +27,8 @@ function mapTask(row: any): Task {
     color: row.color,
     order: Number(row.order),
     done: row.done === true || row.done === 'true',
-    createdAt: row.created_at || row.createdAt,
-    updatedAt: row.updated_at || row.updatedAt,
+    createdAt: toLocalISO(row.created_at || row.createdAt),
+    updatedAt: toLocalISO(row.updated_at || row.updatedAt),
   };
 }
 
@@ -21,9 +39,9 @@ function mapTransaction(row: any): Transaction {
     amount: Number(row.amount),
     category: row.category,
     note: row.note || undefined,
-    date: row.date,
-    createdAt: row.created_at || row.createdAt,
-    updatedAt: row.updated_at || row.updatedAt,
+    date: toLocalDate(row.date),
+    createdAt: toLocalISO(row.created_at || row.createdAt),
+    updatedAt: toLocalISO(row.updated_at || row.updatedAt),
   };
 }
 
@@ -41,9 +59,9 @@ function mapWeight(row: any): WeightLog {
     id: row.id,
     weight: Number(row.weight),
     foodNotes: row.food_notes || row.foodNotes || undefined,
-    date: row.date,
-    createdAt: row.created_at || row.createdAt,
-    updatedAt: row.updated_at || row.updatedAt,
+    date: toLocalDate(row.date),
+    createdAt: toLocalISO(row.created_at || row.createdAt),
+    updatedAt: toLocalISO(row.updated_at || row.updatedAt),
   };
 }
 

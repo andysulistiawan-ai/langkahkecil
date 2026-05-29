@@ -7,7 +7,14 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+function isInvalidDate(dateStr: string): boolean {
+  if (!dateStr) return true;
+  const d = new Date(dateStr);
+  return isNaN(d.getTime());
+}
+
 export function formatDate(dateStr: string, locale: string = 'id'): string {
+  if (isInvalidDate(dateStr)) return '-';
   const date = new Date(dateStr);
   return date.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
     year: 'numeric',
@@ -17,6 +24,7 @@ export function formatDate(dateStr: string, locale: string = 'id'): string {
 }
 
 export function formatDateShort(dateStr: string, locale: string = 'id'): string {
+  if (isInvalidDate(dateStr)) return '-';
   const date = new Date(dateStr);
   return date.toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', {
     month: 'short',
@@ -25,6 +33,7 @@ export function formatDateShort(dateStr: string, locale: string = 'id'): string 
 }
 
 export function formatTime(dateStr: string): string {
+  if (isInvalidDate(dateStr)) return '-';
   const date = new Date(dateStr);
   return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 }
@@ -34,7 +43,11 @@ export function formatDateInput(date: Date): string {
 }
 
 export function getToday(): string {
-  return new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 export function getWeekRange(): { start: string; end: string } {
