@@ -150,6 +150,7 @@ export const useStore = create<AppStore>()(
       addCategory: (name, icon) => {
         const cat: Category = { id: generateId(), name, icon };
         set({ categories: [...get().categories, cat] });
+        get().addToQueue({ action: 'create', collection: 'Categories', id: cat.id, data: cat });
       },
 
       updateSettings: (updates) => {

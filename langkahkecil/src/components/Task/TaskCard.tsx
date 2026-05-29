@@ -26,7 +26,7 @@ export function TaskCard({ task, onEdit, onDragStart, onDragOver, onDrop }: Task
       className={`flex items-center gap-3 p-3 rounded-sm bg-[var(--color-bg-card)] border border-[var(--color-border)] transition-all duration-200 ${
         task.done ? 'opacity-50' : ''
       }`}
-      style={{ borderLeft: `4px solid ${COLOR_MAP[task.color]}` }}
+      style={{ borderLeft: `8px solid ${COLOR_MAP[task.color]}` }}
     >
       <div className="text-[var(--color-text-tertiary)] cursor-grab active:cursor-grabbing">
         <GripVertical size={18} />

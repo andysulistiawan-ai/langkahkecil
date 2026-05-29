@@ -144,7 +144,11 @@ function handleCreate(collection, data) {
   if (!sheet) return errorResponse('Sheet not found');
   ensureHeaders(sheet, collection);
   const headers = HEADERS[collection] || sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const row = headers.map(h => data[h] !== undefined ? data[h] : '');
+  const row = headers.map(h => {
+    if (data[h] !== undefined) return data[h];
+    var camel = h.replace(/_([a-z])/g, function(_, c) { return c.toUpperCase(); });
+    return data[camel] !== undefined ? data[camel] : '';
+  });
   sheet.appendRow(row);
   return successResponse('Created', { id: data.id });
 }
@@ -160,7 +164,12 @@ function handleUpdate(collection, id, data) {
   for (let i = 1; i < values.length; i++) {
     if (values[i][0] === id) {
       headers.forEach((h, j) => {
-        if (data[h] !== undefined) sheet.getRange(i + 1, j + 1).setValue(data[h]);
+        var val = data[h];
+        if (val === undefined) {
+          var camel = h.replace(/_([a-z])/g, function(_, c) { return c.toUpperCase(); });
+          val = data[camel];
+        }
+        if (val !== undefined) sheet.getRange(i + 1, j + 1).setValue(val);
       });
       return successResponse('Updated', { id });
     }

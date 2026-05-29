@@ -32,12 +32,30 @@ export class AppScriptService {
     return { success: true };
   }
 
+  async postAndRead(body: any): Promise<AppScriptResponse> {
+    try {
+      const res = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(body),
+      });
+      const text = await res.text();
+      return JSON.parse(text);
+    } catch {
+      return { success: false, error: 'CORS or network error — cannot read server response' };
+    }
+  }
+
   async init() {
     return this.post({ action: 'init' });
   }
 
   async fetchCollection(collection: string) {
     return this.post({ action: 'fetch', collection });
+  }
+
+  async pullCollection(collection: string) {
+    return this.postAndRead({ action: 'fetch', collection });
   }
 
   async create(collection: string, data: any) {
