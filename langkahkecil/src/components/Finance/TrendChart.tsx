@@ -4,17 +4,22 @@ import { TransactionType } from '@/types';
 
 interface TrendChartProps {
   filter: 'all' | TransactionType;
+  categoryFilter: string[];
   startDate: string;
   endDate: string;
   onStartDateChange: (date: string) => void;
   onEndDateChange: (date: string) => void;
 }
 
-export function TrendChart({ filter, startDate, endDate, onStartDateChange, onEndDateChange }: TrendChartProps) {
+export function TrendChart({ filter, categoryFilter, startDate, endDate, onStartDateChange, onEndDateChange }: TrendChartProps) {
   const transactions = useStore((s) => s.transactions);
   const lang = useStore((s) => s.settings.language);
 
-  const filtered = filter === 'all' ? transactions : transactions.filter((t) => t.type === filter);
+  const filtered = transactions.filter((t) => {
+    if (filter !== 'all' && t.type !== filter) return false;
+    if (categoryFilter.length > 0 && !categoryFilter.includes(t.category)) return false;
+    return true;
+  });
 
   const dailyData: Record<string, { income: number; expense: number }> = {};
   const d = new Date(startDate);

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useStore } from '@/store';
 import { SummaryCards } from '@/components/Finance/SummaryCards';
 import { TrendChart } from '@/components/Finance/TrendChart';
 import { CategoryPanel } from '@/components/Finance/CategoryPanel';
+import { CategoryFilterDropdown } from '@/components/Finance/CategoryFilterDropdown';
 import { FilterChips } from '@/components/Finance/FilterChips';
 import { TransactionList } from '@/components/Finance/TransactionList';
 import { AddTransactionModal } from '@/components/Finance/AddTransactionModal';
@@ -14,6 +15,7 @@ export function FinancePage() {
   const lang = useStore((s) => s.settings.language);
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState<'all' | TransactionType>('all');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const transactions = useStore((s) => s.transactions);
   const today = getToday();
   const sevenDaysAgo = new Date();
@@ -22,6 +24,21 @@ export function FinancePage() {
   const [endDate, setEndDate] = useState(today);
 
   const filtered = filter === 'all' ? transactions : transactions.filter((t) => t.type === filter);
+
+  const categoryFiltered = useMemo(
+    () => selectedCategories.length === 0
+      ? filtered
+      : filtered.filter((t) => selectedCategories.includes(t.category)),
+    [filtered, selectedCategories]
+  );
+
+  const dateFiltered = useMemo(
+    () => categoryFiltered.filter((t) => {
+      const day = t.date.split('T')[0];
+      return day >= startDate && day <= endDate;
+    }),
+    [categoryFiltered, startDate, endDate]
+  );
 
   return (
     <div>
@@ -33,6 +50,7 @@ export function FinancePage() {
         <SummaryCards />
         <TrendChart
           filter={filter}
+          categoryFilter={selectedCategories}
           startDate={startDate}
           endDate={endDate}
           onStartDateChange={setStartDate}
@@ -43,8 +61,11 @@ export function FinancePage() {
           startDate={startDate}
           endDate={endDate}
         />
-        <FilterChips selected={filter} onChange={setFilter} />
-        <TransactionList transactions={filtered} />
+        <div className="flex items-center gap-2 flex-wrap">
+          <FilterChips selected={filter} onChange={setFilter} />
+          <CategoryFilterDropdown selected={selectedCategories} onChange={setSelectedCategories} />
+        </div>
+        <TransactionList transactions={dateFiltered} />
       </div>
 
       <button
