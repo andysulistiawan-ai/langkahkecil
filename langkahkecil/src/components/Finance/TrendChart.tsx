@@ -74,11 +74,12 @@ export function TrendChart({ filter, categoryFilter, startDate, endDate, onStart
           />
         </div>
       </div>
-      <div className="flex items-end gap-1.5 h-[200px]">
+      <div className="overflow-x-auto pb-1">
+        <div className="flex items-end gap-1.5 h-[200px] min-w-fit">
         {chartData.map((d, i) => {
           const netLabel = formatNet(d.net);
           return (
-            <div key={i} className="flex-1 flex flex-col items-center justify-end gap-0.5 h-full">
+            <div key={i} className="w-[28px] shrink-0 flex flex-col items-center justify-end gap-0.5 h-full">
               {netLabel && (
                 <span className={`text-[9px] font-bold whitespace-nowrap ${d.net >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                   {netLabel}
@@ -99,6 +100,7 @@ export function TrendChart({ filter, categoryFilter, startDate, endDate, onStart
           );
         })}
       </div>
+    </div>
     </div>
   );
 }
